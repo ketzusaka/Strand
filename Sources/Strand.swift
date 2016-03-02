@@ -28,7 +28,7 @@ public class Strand {
         let holder = Unmanaged.passRetained(StrandClosure(closure: closure))
         let pointer = UnsafeMutablePointer<Void>(holder.toOpaque())
 
-        guard pthread_create(&pthread, nil, pthreadRunner, pointer) == 0 else { throw StrandError.ThreadCreationFailed }
+        guard pthread_create(&pthread, nil, runner, pointer) == 0 else { throw StrandError.ThreadCreationFailed }
         pthread_detach(pthread)
     }
 
@@ -51,11 +51,11 @@ public class Strand {
     }
 }
 
-private func pthreadRunner(arg: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
+private func runner(arg: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
     let unmanaged = Unmanaged<StrandClosure>.fromOpaque(COpaquePointer(arg))
     unmanaged.takeUnretainedValue().closure()
     unmanaged.release()
-    return arg
+    return UnsafeMutablePointer<Void>()
 }
 
 private class StrandClosure {

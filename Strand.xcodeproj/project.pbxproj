@@ -17,6 +17,7 @@
 		1A337F2F1C86810C000BD314 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1A337F351C8681EB000BD314 /* Strand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Strand.swift; path = Sources/Strand.swift; sourceTree = "<group>"; };
 		1A337F371C8684C7000BD314 /* Package.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		1A337F391C86879C000BD314 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +54,7 @@
 				1A337F2F1C86810C000BD314 /* Info.plist */,
 				1A337F2D1C86810C000BD314 /* Strand.h */,
 				1A337F351C8681EB000BD314 /* Strand.swift */,
+				1A337F391C86879C000BD314 /* README.md */,
 			);
 			name = Strand;
 			sourceTree = "<group>";
