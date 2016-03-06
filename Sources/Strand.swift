@@ -46,9 +46,15 @@ public class Strand {
         }
     }
 
+    #if swift(>=3.0)
+    public class func exit(code: inout Int) {
+        pthread_exit(&code)
+    }
+    #else
     public class func exit(inout code: Int) {
         pthread_exit(&code)
     }
+    #endif
 }
 
 private func runner(arg: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
