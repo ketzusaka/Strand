@@ -9,6 +9,8 @@ let package = Package(
 //from xcode. this will become unnecessary once official xcode+swiftpm support is done.
 //watch progress: https://github.com/apple/swift-package-manager/compare/xcodeproj?expand=1
 
+// Thanks to czechboy0 & the Vapor project for this
+
 let libStrand = Product(name: "Strand", type: .Library(.Dynamic), modules: "Strand")
 products.append(libStrand)
 
