@@ -11,10 +11,15 @@ import Glibc
 import Darwin.C
 #endif
 
-public enum StrandError: ErrorType {
-    case ThreadCreationFailed
-    case ThreadCancellationFailed(Int)
-    case ThreadJoinFailed(Int)
+#if !swift(>=3.0)
+    typealias ErrorProtocol = ErrorType
+    typealias OpaquePointer = COpaquePointer
+#endif
+
+public enum StrandError: ErrorProtocol {
+    case threadCreationFailed
+    case threadCancellationFailed(Int)
+    case threadJoinFailed(Int)
 }
 
 public class Strand {
@@ -26,23 +31,27 @@ public class Strand {
 
     public init(closure: () -> Void) throws {
         let holder = Unmanaged.passRetained(StrandClosure(closure: closure))
-        let pointer = UnsafeMutablePointer<Void>(holder.toOpaque())
+        #if swift(>=3.0)
+            let pointer = UnsafeMutablePointer<Void>(OpaquePointer(bitPattern: holder))
+        #else
+            let pointer = UnsafeMutablePointer<Void>(holder.toOpaque())
+        #endif
 
-        guard pthread_create(&pthread, nil, runner, pointer) == 0 else { throw StrandError.ThreadCreationFailed }
+        guard pthread_create(&pthread, nil, runner, pointer) == 0 else { throw StrandError.threadCreationFailed }
         pthread_detach(pthread)
     }
 
     public func join() throws {
         let status = pthread_join(pthread, nil)
         if status != 0 {
-            throw StrandError.ThreadJoinFailed(Int(status))
+            throw StrandError.threadJoinFailed(Int(status))
         }
     }
 
     public func cancel() throws {
         let status = pthread_cancel(pthread)
         if status != 0 {
-            throw StrandError.ThreadCancellationFailed(Int(status))
+            throw StrandError.threadCancellationFailed(Int(status))
         }
     }
 
@@ -58,10 +67,10 @@ public class Strand {
 }
 
 private func runner(arg: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
-    let unmanaged = Unmanaged<StrandClosure>.fromOpaque(COpaquePointer(arg))
+    let unmanaged = Unmanaged<StrandClosure>.fromOpaque(OpaquePointer(arg))
     unmanaged.takeUnretainedValue().closure()
     unmanaged.release()
-    return UnsafeMutablePointer<Void>()
+    return nil
 }
 
 private class StrandClosure {
