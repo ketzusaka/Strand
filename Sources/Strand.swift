@@ -57,8 +57,6 @@ public class Strand {
         #else
             guard pthread_create(&pthread, nil, runner, pointer) == 0 else { throw StrandError.threadCreationFailed }
         #endif
-
-        pthread_detach(pthread)
     }
 
     public func join() throws {
@@ -84,6 +82,10 @@ public class Strand {
         pthread_exit(&code)
     }
     #endif
+
+    deinit {
+        pthread_detach(pthread)
+    }
 }
 
 #if swift(>=3.0)
