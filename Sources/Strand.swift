@@ -52,6 +52,7 @@ public class Strand {
                 let pthreadPointer: UnsafeMutablePointer<pthread_t?>! = UnsafeMutablePointer<pthread_t?>(allocatingCapacity: 1)
                 pthreadPointer.pointee = pthread
                 guard pthread_create(pthreadPointer, nil, runner, pointer) == 0 else { throw StrandError.threadCreationFailed }
+                pthread = pthreadPointer.pointee
             #endif
         #else
             guard pthread_create(&pthread, nil, runner, pointer) == 0 else { throw StrandError.threadCreationFailed }
