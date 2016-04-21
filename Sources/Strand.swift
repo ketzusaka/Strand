@@ -47,15 +47,21 @@ public class Strand {
 
         #if swift(>=3.0)
             #if os(Linux)
-                guard pthread_create(&pthread, nil, runner, pointer) == 0 else { throw StrandError.threadCreationFailed }
+                guard pthread_create(&pthread, nil, runner, pointer) == 0 else {
+                    holder.release()
+                    throw StrandError.threadCreationFailed
+                }
             #else
-                let pthreadPointer: UnsafeMutablePointer<pthread_t?>! = UnsafeMutablePointer<pthread_t?>(allocatingCapacity: 1)
-                pthreadPointer.pointee = pthread
-                guard pthread_create(pthreadPointer, nil, runner, pointer) == 0 else { throw StrandError.threadCreationFailed }
-                pthread = pthreadPointer.pointee
+                guard pthread_create(&pthread, nil, runner, pointer) == 0 else {
+                    holder.release()
+                    throw StrandError.threadCreationFailed
+                }
             #endif
         #else
-            guard pthread_create(&pthread, nil, runner, pointer) == 0 else { throw StrandError.threadCreationFailed }
+            guard pthread_create(&pthread, nil, runner, pointer) == 0 else {
+                holder.release()
+                throw StrandError.threadCreationFailed
+            }
         #endif
     }
 
