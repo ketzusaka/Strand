@@ -39,11 +39,7 @@ public class Strand {
 
     public init(closure: () -> Void) throws {
         let holder = Unmanaged.passRetained(StrandClosure(closure: closure))
-        #if swift(>=3.0)
-            let pointer = UnsafeMutablePointer<Void>(OpaquePointer(bitPattern: holder))
-        #else
-            let pointer = UnsafeMutablePointer<Void>(holder.toOpaque())
-        #endif
+        let pointer = UnsafeMutablePointer<Void>(holder.toOpaque())
 
         #if swift(>=3.0)
             #if os(Linux)
@@ -96,7 +92,8 @@ public class Strand {
 
 #if swift(>=3.0)
 private func runner(arg: UnsafeMutablePointer<Void>?) -> UnsafeMutablePointer<Void>? {
-    let unmanaged = Unmanaged<StrandClosure>.fromOpaque(OpaquePointer(arg!))
+    guard let arg = arg else { return nil }
+    let unmanaged = Unmanaged<StrandClosure>.fromOpaque(arg)
     unmanaged.takeUnretainedValue().closure()
     unmanaged.release()
     return nil
