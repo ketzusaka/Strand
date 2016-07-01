@@ -40,13 +40,23 @@ public class Strand {
     public init(closure: () -> Void) throws {
         let holder = Unmanaged.passRetained(StrandClosure(closure: closure))
 
-        let runner: @convention(c) (UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void>? = { arg in
+        #if os(Linux)
+        let runner: @convention(c) (UnsafeMutablePointer<Void>?) -> UnsafeMutablePointer<Void>? = { arg in
+            guard let arg = arg else { return nil }
             let unmanaged = Unmanaged<StrandClosure>.fromOpaque(arg)
             unmanaged.takeUnretainedValue().closure()
             unmanaged.release()
             return nil
         }
-        
+        #else
+            let runner: @convention(c) (UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void>? = { arg in
+                let unmanaged = Unmanaged<StrandClosure>.fromOpaque(arg)
+                unmanaged.takeUnretainedValue().closure()
+                unmanaged.release()
+                return nil
+            }
+        #endif
+
         #if swift(>=3.0)
             let pointer = UnsafeMutablePointer<Void>(holder.toOpaque())
             #if os(Linux)
