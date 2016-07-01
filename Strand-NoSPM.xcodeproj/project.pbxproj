@@ -149,6 +149,9 @@
 					0A4B176D1D04AE68004F2DB2 = {
 						CreatedOnToolsVersion = 7.3;
 					};
+					3EC42E65FA86DBBE05A0F952 = {
+						LastSwiftMigration = 0800;
+					};
 				};
 			};
 			buildConfigurationList = 32B8E9BB67D165D16892A7F0 /* Build configuration list for PBXProject "Strand-NoSPM" */;
@@ -486,6 +489,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -502,6 +506,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
