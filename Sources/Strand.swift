@@ -94,12 +94,22 @@ public class Strand {
 }
 
 #if swift(>=3.0)
-private func runner(arg: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void>? {
-    let unmanaged = Unmanaged<StrandClosure>.fromOpaque(arg)
-    unmanaged.takeUnretainedValue().closure()
-    unmanaged.release()
-    return nil
-}
+    #if os(Linux)
+    private func runner(arg: UnsafeMutablePointer<Void>?) -> UnsafeMutablePointer<Void>? {
+        guard let arg = arg else { return nil }
+        let unmanaged = Unmanaged<StrandClosure>.fromOpaque(arg)
+        unmanaged.takeUnretainedValue().closure()
+        unmanaged.release()
+        return nil
+    }
+    #else
+    private func runner(arg: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void>? {
+        let unmanaged = Unmanaged<StrandClosure>.fromOpaque(arg)
+        unmanaged.takeUnretainedValue().closure()
+        unmanaged.release()
+        return nil
+    }
+    #endif
 #else
 private func runner(arg: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
     let unmanaged = Unmanaged<StrandClosure>.fromOpaque(OpaquePointer(arg))
