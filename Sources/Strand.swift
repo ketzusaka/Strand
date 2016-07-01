@@ -39,8 +39,15 @@ public class Strand {
 
     public init(closure: () -> Void) throws {
         let holder = Unmanaged.passRetained(StrandClosure(closure: closure))
-        let pointer = UnsafeMutablePointer<Void>(holder.toOpaque())
 
+        let runner: @convention(c) (UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void>? = { arg in
+            let unmanaged = Unmanaged<StrandClosure>.fromOpaque(arg)
+            unmanaged.takeUnretainedValue().closure()
+            unmanaged.release()
+            return nil
+        }
+
+        let pointer = UnsafeMutablePointer<Void>(holder.toOpaque())
         #if swift(>=3.0)
             #if os(Linux)
                 guard pthread_create(&pthread, nil, runner, pointer) == 0 else {
@@ -55,13 +62,14 @@ public class Strand {
             #endif
         #else
             guard pthread_create(&pthread, nil, runner, pointer) == 0 else {
-                holder.release()
-                throw StrandError.threadCreationFailed
+            holder.release()
+            throw StrandError.threadCreationFailed
             }
         #endif
     }
 
     public func join() throws {
+        guard let pthread = pthread else { throw StrandError.threadJoinFailed(-1) }
         let status = pthread_join(pthread, nil)
         if status != 0 {
             throw StrandError.threadJoinFailed(Int(status))
@@ -69,6 +77,7 @@ public class Strand {
     }
 
     public func cancel() throws {
+        guard let pthread = pthread else { throw StrandError.threadCancellationFailed(-1) }
         let status = pthread_cancel(pthread)
         if status != 0 {
             throw StrandError.threadCancellationFailed(Int(status))
@@ -86,26 +95,9 @@ public class Strand {
     #endif
 
     deinit {
-        pthread_detach(pthread)
+        if let pthread = pthread { pthread_detach(pthread) }
     }
 }
-
-#if swift(>=3.0)
-private func runner(arg: UnsafeMutablePointer<Void>?) -> UnsafeMutablePointer<Void>? {
-    guard let arg = arg else { return nil }
-    let unmanaged = Unmanaged<StrandClosure>.fromOpaque(arg)
-    unmanaged.takeUnretainedValue().closure()
-    unmanaged.release()
-    return nil
-}
-#else
-private func runner(arg: UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void> {
-    let unmanaged = Unmanaged<StrandClosure>.fromOpaque(OpaquePointer(arg))
-    unmanaged.takeUnretainedValue().closure()
-    unmanaged.release()
-    return nil
-}
-#endif
 
 private class StrandClosure {
     let closure: () -> Void
