@@ -12,11 +12,11 @@ import Darwin.C
 #endif
 
 #if !swift(>=3.0)
-    typealias ErrorProtocol = ErrorType
+    typealias Error = ErrorType
     typealias OpaquePointer = COpaquePointer
 #endif
 
-public enum StrandError: ErrorProtocol {
+public enum StrandError: Error {
     case threadCreationFailed
     case threadCancellationFailed(Int)
     case threadJoinFailed(Int)
