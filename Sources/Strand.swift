@@ -12,7 +12,7 @@ import Darwin.C
 #endif
 
 #if !swift(>=3.0)
-    typealias ErrorProtocol = ErrorType
+    typealias Error = ErrorType
     typealias OpaquePointer = COpaquePointer
 #endif
 
