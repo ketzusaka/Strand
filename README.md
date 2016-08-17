@@ -11,7 +11,7 @@ instance. The thread will run as expected.
 var data: String?
 
 let s = try Strand {
-    data = "hi~"
+    data = "Hi~"
 }
 
 try s.join()
